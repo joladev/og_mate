@@ -1,8 +1,8 @@
-defmodule OgMateTest do
+defmodule OGMateTest do
   use ExUnit.Case
-  doctest OgMate
+  doctest OGMate
 
   test "greets the world" do
-    assert OgMate.hello() == :world
+    assert OGMate.hello() == :world
   end
 end

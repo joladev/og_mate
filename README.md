@@ -1,4 +1,4 @@
-# OgMate
+# OGMate
 
 **TODO: Add description**
 

@@ -1,4 +1,4 @@
-defmodule OgMate.MixProject do
+defmodule OGMate.MixProject do
   use Mix.Project
 
   def project do
@@ -21,8 +21,9 @@ defmodule OgMate.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:image, "~> 0.67.0"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.40.2", only: :dev, runtime: false}
     ]
   end
 end
