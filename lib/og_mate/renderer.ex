@@ -41,15 +41,14 @@ defmodule OGMate.Renderer do
   rendering step fails.
   """
   @spec render(String.t(), String.t(), map()) :: {:ok, binary()} | {:error, term()}
-  def render(title, desc, theme) do
+  def render(title, description, theme) do
     with {:ok, img} <-
-           Image.new(@width, @height, color: Keyword.get(theme, :background, "#000000")),
+           Image.new(@width, @height, color: Map.get(theme, :background, "#000000")),
          {:ok, img} <- render_logo(img, theme),
          {:ok, img} <- render_wordmark(img, theme),
          {:ok, img} <- render_title(img, title, theme),
-         {:ok, img} <- render_desc(img, desc, theme),
-         {:ok, png} <- Image.write(img, :memory, suffix: ".png") do
-      {:ok, png}
+         {:ok, img} <- render_description(img, description, theme) do
+      Image.write(img, :memory, suffix: ".png")
     end
   end
 
@@ -59,9 +58,8 @@ defmodule OGMate.Renderer do
 
   defp render_logo(img, theme) do
     with {:ok, data} <- File.read(theme[:logo]),
-         {:ok, logo_img} <- Image.from_binary(data, width: @logo_size, height: @logo_size),
-         {:ok, result} <- Image.compose(img, logo_img, x: @padding, y: @padding, mode: "atop") do
-      {:ok, result}
+         {:ok, logo_img} <- Image.from_binary(data, width: @logo_size, height: @logo_size) do
+      Image.compose(img, logo_img, x: @padding, y: @padding, mode: "atop")
     end
   end
 
@@ -72,9 +70,9 @@ defmodule OGMate.Renderer do
   defp render_wordmark(img, theme) do
     with {:ok, text_img} <-
            Image.Text.text(theme[:wordmark],
-             font: Keyword.get(theme, :font, "Inter"),
+             font: Map.get(theme, :font, "Inter"),
              font_size: @wordmark_size,
-             text_fill_color: Keyword.get(theme, :muted, "#a3a3a3")
+             text_fill_color: Map.get(theme, :muted, "#a3a3a3")
            ) do
       Image.compose(img, text_img,
         x: @padding + @logo_size + @logo_gap,
@@ -89,9 +87,9 @@ defmodule OGMate.Renderer do
   defp render_title(img, title, theme) when is_binary(title) and title != "" do
     with {:ok, text_img} <-
            Image.Text.text(title,
-             font: Keyword.get(theme, :font, "Inter"),
+             font: Map.get(theme, :font, "Inter"),
              font_size: @title_size,
-             text_fill_color: Keyword.get(theme, :foreground, "#ffffff"),
+             text_fill_color: Map.get(theme, :foreground, "#ffffff"),
              font_weight: :bold
            ) do
       Image.compose(img, text_img,
@@ -106,12 +104,13 @@ defmodule OGMate.Renderer do
 
   # ── Description layer (below title, 20px) ─────────────────────────
 
-  defp render_desc(img, desc, theme) when is_binary(desc) and desc != "" do
+  defp render_description(img, description, theme)
+       when is_binary(description) and description != "" do
     with {:ok, text_img} <-
-           Image.Text.text(desc,
-             font: Keyword.get(theme, :font, "Inter"),
+           Image.Text.text(description,
+             font: Map.get(theme, :font, "Inter"),
              font_size: @desc_size,
-             text_fill_color: Keyword.get(theme, :muted, "#a3a3a3")
+             text_fill_color: Map.get(theme, :muted, "#a3a3a3")
            ) do
       Image.compose(img, text_img,
         x: @padding,
@@ -121,5 +120,5 @@ defmodule OGMate.Renderer do
     end
   end
 
-  defp render_desc(img, _desc, _theme), do: {:ok, img}
+  defp render_description(img, _description, _theme), do: {:ok, img}
 end

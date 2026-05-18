@@ -15,3 +15,45 @@ def deps do
   ]
 end
 ```
+
+## Examples
+
+Happy path example.
+
+```elixir
+defmodule MyApp.OGImage do
+  use OGMate,
+    theme: [
+      background: "#0a0a0a",
+      foreground: "white",
+      muted: "#a3a3a3",
+      font: "Inter",
+      logo: "priv/static/images/logo.png",
+      wordmark: "myapp.com"
+    ],
+    default: {"MyApp", "A brief site description."}
+
+  @impl OGMate
+  def all_keys, do: ["home", "about"]
+
+  @impl OGMate
+  def content_for("home"), do: {"MyApp", "Welcome."}
+  def content_for("about"), do: {"About", "My cool site"}
+end
+
+{:ok, png} = MyApp.OGImage.image_for("home")
+```
+
+Replacing the template with your own renderer
+
+```elixir
+defmodule MyApp.OGImage do
+  use OGMate, theme: [...], default: {...}
+
+  @impl OGMate
+  def render(title, desc, theme) do
+    # Full control: Image.New! → Image.Draw → Image.Text → Image.compose → Image.write
+    # Return {:ok, png_binary} or {:error, reason}
+  end
+end
+```

@@ -12,30 +12,29 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - elixir: "1.19"
-            otp: "27"
+          - elixir: "1.17.0"
+            otp: "25.3"
             unlock: false
-          - elixir: "1.19"
-            otp: "28"
+          - elixir: "1.19.5"
+            otp: "28.5"
             unlock: false
-          - elixir: "1.19"
-            otp: "28"
+          - elixir: "1.19.5"
+            otp: "28.5"
             unlock: true
 
-    env:
-      MIX_ENV: test
-
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: erlef/setup-beam@v1
         with:
           elixir-version: ${{ matrix.elixir }}
           otp-version: ${{ matrix.otp }}
 
-      - uses: actions/cache@v4
+      - name: Cache deps and build
+        uses: actions/cache@v5
         with:
           path: |
             deps
@@ -44,15 +43,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
 
+      - name: Check formatting
+        run: mix format --check-formatted
+
       - name: Unlock deps
         if: matrix.unlock
         run: mix deps.unlock --all
 
       - name: Install dependencies
         run: mix deps.get
-
-      - name: Check formatting
-        run: mix format --check-formatted
 
       - name: Compile with warnings as errors
         run: mix compile --warnings-as-errors

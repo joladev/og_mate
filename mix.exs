@@ -5,7 +5,7 @@ defmodule OGMate.MixProject do
     [
       app: :og_mate,
       version: "0.1.0",
-      elixir: "~> 1.19",
+      elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases()

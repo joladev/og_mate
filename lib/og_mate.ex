@@ -67,8 +67,9 @@ defmodule OGMate do
   Given a key, return `{title, description}`, or `:error` if the key
   shouldn't produce an image.
 
-  keys that return `:error` are listed by `all_keys/0` but are skipped
-  during baking (they resolve to the default image at runtime).
+  Keys in all_keys/0 MUST return {title, description} — returning :error for a
+  key in all_keys/0 raises at compile time. :error is the runtime fallback for
+  keys not in all_keys/0 (unknown slugs resolve to the default image).
   """
   @callback content_for(key :: String.t()) :: {String.t(), String.t()} | :error
 
@@ -79,7 +80,7 @@ defmodule OGMate do
   description for the current key, plus the theme map. Must return a
   PNG binary wrapped in `{:ok, ...}` or `{:error, reason}`.
 
-  If rendering fails (`{:error, _}`), the key is skipped during baking.
+  If rendering fails (`{:error, _}`), it raises at compile time.
   If not implemented, the default renderer is used.
   """
   @callback render(title :: String.t(), description :: String.t(), theme()) ::
@@ -122,7 +123,7 @@ defmodule OGMate do
       @og_dev_mode unquote(dev_mode_code)
 
       # ── Always-baked default image (fixed cost, no data dependency) ──
-      @og_default OGMate.__bake__(
+      @og_default OGMate.__bake__!(
                     __MODULE__,
                     unquote(default_title),
                     unquote(default_description),
@@ -132,16 +133,8 @@ defmodule OGMate do
       # ── Content images (baked in prod, lazy in dev) ──────────────
       @og_images if(not @og_dev_mode) do
         Map.new(all_keys(), fn key ->
-          case content_for(key) do
-            {title, description} ->
-              case OGMate.__bake__(__MODULE__, title, description, @og_theme) do
-                {:ok, bytes} -> {key, bytes}
-                {:error, _} -> :skip
-              end
-
-            :error ->
-              :skip
-          end
+          {title, description} = content_for(key)
+          {key, OGMate.__bake__!(__MODULE__, title, description, @og_theme)}
         end)
       end
 
@@ -151,15 +144,11 @@ defmodule OGMate do
       def image_for(key) do
         case @og_images do
           nil ->
-            # Dev mode: render on demand
-            {title, description} = content_for(key)
+            case content_for(key) do
+              {title, description} ->
+                {:ok, OGMate.__bake__!(__MODULE__, title, description, @og_theme)}
 
-            case OGMate.__bake__(__MODULE__, title, description, @og_theme) do
-              {:ok, bytes} ->
-                {:ok, bytes}
-
-              {:error, reason} ->
-                IO.warn("render failed for #{inspect(key)}: #{inspect(reason)}, using default")
+              :error ->
                 {:ok, @og_default}
             end
 
@@ -172,26 +161,22 @@ defmodule OGMate do
       end
 
       @doc "Returns the pre-baked default PNG binary."
-      def default_image(), do: @og_default
+      def default_image, do: @og_default
 
       # ── Recompile hook ───────────────────────────────────────────
-      def __mix_recompile__(), do: all_keys()
+      def __mix_recompile__, do: all_keys()
     end
   end
 
-  @doc """
-  Bake an image from `{title, description}` + theme.
-
-  Dispatches to the user's `render/3` (if implemented) or falls back
-  to `OGMate.Renderer.render/3`. Always returns `{:ok, bytes}` or
-  `{:error, reason}`.
-  """
-  @spec __bake__(module(), String.t(), String.t(), map()) ::
-          {:ok, binary()} | {:error, term()}
-  def __bake__(module, title, description, theme) do
+  @doc false
+  @spec __bake__!(module(), String.t(), String.t(), map()) :: binary()
+  def __bake__!(module, title, description, theme) do
     case render(module, title, description, theme) do
-      {:ok, bytes} -> {:ok, bytes}
-      {:error, reason} -> {:error, reason}
+      {:ok, bytes} ->
+        bytes
+
+      {:error, reason} ->
+        raise "OGMate render failed for #{inspect({title, description})}: #{inspect(reason)}"
     end
   end
 
