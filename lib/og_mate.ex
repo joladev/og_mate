@@ -28,6 +28,20 @@ defmodule OGMate do
       end
 
       {:ok, png} = MyApp.OGImage.image_for("home")
+
+  ## Custom Templates
+
+  If the default layout doesn't fit your site, implement `render/3` on your module:
+
+      defmodule MyApp.OGImage do
+        use OGMate, theme: [...], default: {...}
+
+        @impl OGMate
+        def render(title, desc, theme) do
+          # Full control: Image.New! → Image.Draw → Image.Text → Image.compose → Image.write
+          # Return {:ok, png_binary} or {:error, reason}
+        end
+      end
   """
 
   @typedoc "The theme map passed to render callbacks."
@@ -68,7 +82,7 @@ defmodule OGMate do
   If rendering fails (`{:error, _}`), the key is skipped during baking.
   If not implemented, the default renderer is used.
   """
-  @callback render(title :: String.t(), desc :: String.t(), theme()) ::
+  @callback render(title :: String.t(), description :: String.t(), theme()) ::
               {:ok, binary()} | {:error, term()}
 
   @doc """
@@ -97,7 +111,7 @@ defmodule OGMate do
     opts = Module.get_attribute(env.module, :og_opts)
 
     theme = opts |> Keyword.fetch!(:theme) |> Map.new()
-    {default_title, default_desc} = Keyword.fetch!(opts, :default)
+    {default_title, default_description} = Keyword.fetch!(opts, :default)
     dev_mode = Keyword.get(opts, :dev_mode, false)
 
     theme_code = Macro.escape(theme)
@@ -111,7 +125,7 @@ defmodule OGMate do
       @og_default OGMate.__bake__(
                     __MODULE__,
                     unquote(default_title),
-                    unquote(default_desc),
+                    unquote(default_description),
                     @og_theme
                   )
 
