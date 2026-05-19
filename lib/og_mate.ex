@@ -1,8 +1,8 @@
 defmodule OGMate do
   @moduledoc """
-  Bakes PNG images at compile time from a user-provided key list and
-  content function. Always returns `{:ok, bytes}` from `image_for/1` —
-  unknown keys resolve to the pre-baked default image.
+  Builds PNG images at compile time from a user-provided key list and
+  content function. Always returns `{:ok, bytes}` from `image_for/1`.
+  Unknown keys resolve to the pre-built default image.
 
   ## Example
 

@@ -19,7 +19,7 @@ defmodule OGMateTest do
     :ok
   end
 
-  test "bakes images for all keys using custom renderer" do
+  test "builds images for all keys using custom renderer" do
     defmodule Example do
       use OGMate,
         all_keys: ["home", "about"],
