@@ -28,7 +28,8 @@ defmodule OGMate.MixProject do
     [
       {:image, "~> 0.67.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.40.2", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.40.2", only: :dev, runtime: false},
+      {:nimble_options, "~> 1.1"}
     ]
   end
 

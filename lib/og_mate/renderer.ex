@@ -5,7 +5,7 @@ defmodule OGMate.Renderer do
   Layout:
 
       ┌──────────────────────────────┐
-      │  [logo]  wordmark            │  ← top-left, 40px padding
+      │  [logo]  site_name           │  ← top-left, 40px padding
       │                              │
       │                              │
       │                              │
@@ -20,6 +20,8 @@ defmodule OGMate.Renderer do
   rendering step fails (font unavailable, image read failure, etc.).
   """
 
+  alias OGMate.Theme
+
   # Canvas dimensions (OG standard)
   @width 1200
   @height 630
@@ -32,20 +34,20 @@ defmodule OGMate.Renderer do
   @desc_y 500
   @title_size 48
   @desc_size 20
-  @wordmark_size 24
+  @site_name_size 24
 
   @doc """
-  Render title + description + logo + wordmark into a 1200×630 PNG.
+  Render title + description + logo + site_name into a 1200×630 PNG.
 
   Returns `{:ok, png_binary}` on success, or `{:error, reason}` if any
   rendering step fails.
   """
-  @spec render(String.t(), String.t(), map()) :: {:ok, binary()} | {:error, term()}
-  def render(title, description, theme) do
+  @spec render(String.t(), String.t(), Theme.t()) :: {:ok, binary()} | {:error, term()}
+  def render(title, description, theme = %Theme{}) do
     with {:ok, img} <-
-           Image.new(@width, @height, color: Map.get(theme, :background, "#000000")),
+           Image.new(@width, @height, color: theme.background),
          {:ok, img} <- render_logo(img, theme),
-         {:ok, img} <- render_wordmark(img, theme),
+         {:ok, img} <- render_site_name(img, theme),
          {:ok, img} <- render_title(img, title, theme),
          {:ok, img} <- render_description(img, description, theme) do
       Image.write(img, :memory, suffix: ".png")
@@ -54,25 +56,25 @@ defmodule OGMate.Renderer do
 
   # ── Logo layer ───────────────────────────────────────────────────
 
-  defp render_logo(img, %{logo: nil}), do: {:ok, img}
+  defp render_logo(img, %Theme{logo: nil}), do: {:ok, img}
 
-  defp render_logo(img, theme) do
-    with {:ok, data} <- File.read(theme[:logo]),
+  defp render_logo(img, theme = %Theme{}) do
+    with {:ok, data} <- File.read(theme.logo),
          {:ok, logo_img} <- Image.from_binary(data, width: @logo_size, height: @logo_size) do
       Image.compose(img, logo_img, x: @padding, y: @padding, mode: "atop")
     end
   end
 
-  # ── Wordmark layer ────────────────────────────────────────────────
+  # ── site_name layer ────────────────────────────────────────────────
 
-  defp render_wordmark(img, %{wordmark: nil}), do: {:ok, img}
+  defp render_site_name(img, %Theme{site_name: nil}), do: {:ok, img}
 
-  defp render_wordmark(img, theme) do
+  defp render_site_name(img, theme = %Theme{}) do
     with {:ok, text_img} <-
-           Image.Text.text(theme[:wordmark],
-             font: Map.get(theme, :font, "Inter"),
-             font_size: @wordmark_size,
-             text_fill_color: Map.get(theme, :muted, "#a3a3a3")
+           Image.Text.text(theme.site_name,
+             font: theme.font,
+             font_size: @site_name_size,
+             text_fill_color: theme.secondary
            ) do
       Image.compose(img, text_img,
         x: @padding + @logo_size + @logo_gap,
@@ -84,12 +86,12 @@ defmodule OGMate.Renderer do
 
   # ── Title layer (bottom-aligned, 48px bold) ───────────────────────
 
-  defp render_title(img, title, theme) when is_binary(title) and title != "" do
+  defp render_title(img, title, theme = %Theme{}) when is_binary(title) and title != "" do
     with {:ok, text_img} <-
            Image.Text.text(title,
-             font: Map.get(theme, :font, "Inter"),
+             font: theme.font,
              font_size: @title_size,
-             text_fill_color: Map.get(theme, :foreground, "#ffffff"),
+             text_fill_color: theme.foreground,
              font_weight: :bold
            ) do
       Image.compose(img, text_img,
@@ -104,13 +106,13 @@ defmodule OGMate.Renderer do
 
   # ── Description layer (below title, 20px) ─────────────────────────
 
-  defp render_description(img, description, theme)
+  defp render_description(img, description, theme = %Theme{})
        when is_binary(description) and description != "" do
     with {:ok, text_img} <-
            Image.Text.text(description,
-             font: Map.get(theme, :font, "Inter"),
+             font: theme.font,
              font_size: @desc_size,
-             text_fill_color: Map.get(theme, :muted, "#a3a3a3")
+             text_fill_color: theme.secondary
            ) do
       Image.compose(img, text_img,
         x: @padding,
