@@ -9,10 +9,10 @@ defmodule OGMate do
       defmodule MyApp.OGImage do
         use OGMate,
           all_keys: ["home", "about"],
-          content_for: &MyApp.OGContent.content_for/1,
+          content_for: MyApp.OGContent,
           theme: [
             background: "#0a0a0a",
-            foreground: "white",
+            foreground: "#ffffff",
             font: "Inter",
             secondary: "#a3a3a3",
             logo: "priv/static/images/logo.png",

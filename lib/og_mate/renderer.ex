@@ -27,14 +27,14 @@ defmodule OGMate.Renderer do
   @height 630
 
   # Layout constants
-  @padding 40
-  @logo_size 48
-  @logo_gap 8
-  @title_y 470
+  @padding 80
+  @logo_size 72
+  @logo_gap 20
+  @title_bottom_y 470
   @desc_y 500
-  @title_size 48
-  @desc_size 20
-  @site_name_size 24
+  @title_size 72
+  @desc_size 32
+  @site_name_size 48
 
   @doc """
   Render title + description + logo + site_name into a 1200×630 PNG.
@@ -51,6 +51,22 @@ defmodule OGMate.Renderer do
          {:ok, img} <- render_title(img, title, theme),
          {:ok, img} <- render_description(img, description, theme) do
       Image.write(img, :memory, suffix: ".png")
+    end
+  end
+
+  # ── Title layer (bottom-aligned, 48px bold) ───────────────────────
+
+  defp render_title(img, title, theme = %Theme{}) when is_binary(title) and title != "" do
+    with {:ok, text_img} <-
+           Image.Text.text(title,
+             font: theme.font,
+             font_size: @title_size,
+             text_fill_color: theme.foreground,
+             font_weight: :bold,
+             width: @width - 2 * @padding
+           ) do
+      y = @title_bottom_y - Image.height(text_img)
+      Image.compose(img, text_img, x: @padding, y: y, mode: "atop")
     end
   end
 
@@ -74,35 +90,15 @@ defmodule OGMate.Renderer do
            Image.Text.text(theme.site_name,
              font: theme.font,
              font_size: @site_name_size,
-             text_fill_color: theme.secondary
+             font_weight: :bold,
+             text_fill_color: theme.foreground
            ) do
-      Image.compose(img, text_img,
-        x: @padding + @logo_size + @logo_gap,
-        y: @padding,
-        mode: "atop"
-      )
+      x = if theme.logo, do: @padding + @logo_size + @logo_gap, else: @padding
+      y = @padding + div(@logo_size - Image.height(text_img), 2)
+
+      Image.compose(img, text_img, x: x, y: y, mode: "atop")
     end
   end
-
-  # ── Title layer (bottom-aligned, 48px bold) ───────────────────────
-
-  defp render_title(img, title, theme = %Theme{}) when is_binary(title) and title != "" do
-    with {:ok, text_img} <-
-           Image.Text.text(title,
-             font: theme.font,
-             font_size: @title_size,
-             text_fill_color: theme.foreground,
-             font_weight: :bold
-           ) do
-      Image.compose(img, text_img,
-        x: @padding,
-        y: @title_y,
-        mode: "atop"
-      )
-    end
-  end
-
-  defp render_title(img, _title, _theme), do: {:ok, img}
 
   # ── Description layer (below title, 20px) ─────────────────────────
 
@@ -112,13 +108,10 @@ defmodule OGMate.Renderer do
            Image.Text.text(description,
              font: theme.font,
              font_size: @desc_size,
-             text_fill_color: theme.secondary
+             text_fill_color: theme.secondary,
+             width: @width - 2 * @padding
            ) do
-      Image.compose(img, text_img,
-        x: @padding,
-        y: @desc_y,
-        mode: "atop"
-      )
+      Image.compose(img, text_img, x: @padding, y: @desc_y, mode: "atop")
     end
   end
 
