@@ -5,15 +5,15 @@ defmodule OGMate.Renderer do
   Layout:
 
       ┌──────────────────────────────┐
-      │  [logo]  site_name           │  ← top-left, 40px padding
+      │  [logo]  site_name           │  ← top-left, 80px padding
       │                              │
       │                              │
       │                              │
       │                              │
       │                              │
       │                              │
-      │  Title (48px bold)           │  ← y = 470
-      │  Description (20px)          │  ← y = 500
+      │  Title (72px bold)           │  ← bottom y = 470
+      │  Description (32px)          │  ← y = 500
       └──────────────────────────────┘
 
   Returns `{:ok, png_binary}` on success or `{:error, reason}` if any

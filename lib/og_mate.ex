@@ -41,7 +41,8 @@ defmodule OGMate do
 
   `:theme` and `:renderer` are mutually exclusive.
 
-  See `OGMate.Options` for the full option contract.
+  See `OGMate.Options` for the full option contract, and the
+  [Getting started guide](getting_started.md) for end-to-end setup.
   """
 
   # ── Using macro ──────────────────────────────────────────────────

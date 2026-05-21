@@ -8,7 +8,7 @@ defmodule OGMate.MixProject do
     [
       app: :og_mate,
       version: @version,
-      elixir: "~> 1.17",
+      elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
@@ -54,14 +54,14 @@ defmodule OGMate.MixProject do
     [
       licenses: ["MIT"],
       links: %{"GitHub" => @source_url},
-      files: ~w(lib mix.exs README.md LICENSE)
+      files: ~w(lib mix.exs README.md LICENSE guides)
     ]
   end
 
   defp docs do
     [
       main: "readme",
-      extras: ["README.md", "LICENSE"],
+      extras: ["README.md", "guides/getting_started.md", "LICENSE"],
       source_ref: "v#{@version}"
     ]
   end

@@ -19,6 +19,7 @@ defmodule OGMate.Options do
   @enforce_keys [:all_keys, :content_for, :default]
   defstruct [:all_keys, :content_for, :default, :dev_mode, :theme, :renderer]
 
+  @doc false
   def validate!(opts) do
     validated = NimbleOptions.validate!(opts, @schema) |> Map.new()
     Code.ensure_compiled!(validated.content_for)

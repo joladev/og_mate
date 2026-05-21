@@ -6,6 +6,8 @@ OG, or Open Graph, images are shown by social media and chat apps as a preview i
 
 OGMate is designed specifically to reduce the lift to get OG images going for your Elixir blog or site, with an opinionated basic template. The library also provides escape hatches for setting up your own image generation and just using the boilerplate to organize things. It's agnostic to your actual routes and metadata, you provide the implementation for fetching image keys, titles, and descriptions.
 
+For an end-to-end setup including a Plug, layout integration, and optional dev mode config, see the [Getting started guide](https://hexdocs.pm/og_mate/getting_started.html). Basic examples available below.
+
 ## Installation
 
 ```elixir
@@ -67,7 +69,6 @@ end
 ```
 
 You can either set `renderer` or `theme`, you can't set both.
-
 
 ## Theme
 
