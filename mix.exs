@@ -8,7 +8,7 @@ defmodule OGMate.MixProject do
     [
       app: :og_mate,
       version: @version,
-      elixir: "~> 1.18",
+      elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
@@ -35,7 +35,15 @@ defmodule OGMate.MixProject do
       {:nimble_options, "~> 1.1"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.40.2", only: :dev, runtime: false}
-    ]
+    ] ++ json_polyfill()
+  end
+
+  defp json_polyfill do
+    if Code.ensure_loaded?(:json) do
+      []
+    else
+      [{:json_polyfill, "~> 0.1"}]
+    end
   end
 
   defp aliases do
