@@ -1,28 +1,76 @@
-defmodule OgMate.MixProject do
+defmodule OGMate.MixProject do
   use Mix.Project
+
+  @version "0.1.0"
+  @source_url "https://github.com/joladev/og_mate"
 
   def project do
     [
       app: :og_mate,
-      version: "0.1.0",
-      elixir: "~> 1.19",
+      version: @version,
+      elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases(),
+      name: "OGMate",
+      description: "OG image generation for Elixir content sites.",
+      source_url: @source_url,
+      homepage_url: @source_url,
+      package: package(),
+      docs: docs()
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
-    [
-      extra_applications: [:logger]
-    ]
+    [extra_applications: [:logger]]
   end
 
-  # Run "mix help deps" to learn about dependencies.
+  def cli do
+    [preferred_envs: [precommit: :test]]
+  end
+
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:image, "~> 0.67.0"},
+      {:nimble_options, "~> 1.1"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.40.2", only: :dev, runtime: false}
+    ] ++ json_polyfill()
+  end
+
+  defp json_polyfill do
+    if Code.ensure_loaded?(:json) do
+      []
+    else
+      [{:json_polyfill, "~> 0.1"}]
+    end
+  end
+
+  defp aliases do
+    [
+      precommit: [
+        "compile --warnings-as-errors",
+        "deps.unlock --unused",
+        "format",
+        "test",
+        "credo --strict"
+      ]
+    ]
+  end
+
+  defp package do
+    [
+      licenses: ["MIT"],
+      links: %{"GitHub" => @source_url},
+      files: ~w(lib mix.exs README.md LICENSE guides)
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md", "guides/getting_started.md", "LICENSE"],
+      source_ref: "v#{@version}"
     ]
   end
 end
