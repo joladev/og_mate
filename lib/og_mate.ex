@@ -89,13 +89,12 @@ defmodule OGMate do
 
       def default_image, do: @og_default
 
-      defp lookup(key) do
-        if @og_images do
-          case Map.fetch(@og_images, key) do
-            {:ok, bytes} -> {:ok, bytes}
-            :error -> {:ok, @og_default}
-          end
-        else
+      if @og_images do
+        defp lookup(key) do
+          Map.fetch(@og_images, key)
+        end
+      else
+        defp lookup(key) do
           with {title, desc} <- @og_content_for.content_for(key) do
             {:ok, OGMate.__render__!(@og_theme, @og_renderer, title, desc)}
           end
