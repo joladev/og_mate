@@ -13,7 +13,7 @@ For an end-to-end setup including a Plug, layout integration, and optional dev m
 ```elixir
 def deps do
   [
-    {:og_mate, "~> 0.1.0"}
+    {:og_mate, "~> 0.1.1"}
   ]
 end
 ```
