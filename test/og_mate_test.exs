@@ -65,4 +65,12 @@ defmodule OGMateTest do
     assert {:ok, bytes} = Example.image_for("home")
     assert <<0x89, "PNG", _rest::binary>> = bytes
   end
+
+  test "passes type checking in dev mode" do
+    assert {:ok, "fake:Home"} = DevMode.image_for("home")
+  end
+
+  test "passes type checking without dev mode" do
+    assert {:ok, "fake:Home"} = Dummy.image_for("home")
+  end
 end

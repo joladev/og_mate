@@ -21,8 +21,8 @@ jobs:
           - elixir: "1.19.5"
             otp: "28.5"
             unlock: false
-          - elixir: "1.19.5"
-            otp: "28.5"
+          - elixir: "1.20.0-rc.6"
+            otp: "29"
             unlock: true
 
     steps:

@@ -17,7 +17,8 @@ defmodule OGMate.MixProject do
       source_url: @source_url,
       homepage_url: @source_url,
       package: package(),
-      docs: docs()
+      docs: docs(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -28,6 +29,10 @@ defmodule OGMate.MixProject do
   def cli do
     [preferred_envs: [precommit: :test]]
   end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp deps do
     [
