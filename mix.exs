@@ -36,7 +36,7 @@ defmodule OGMate.MixProject do
 
   defp deps do
     [
-      {:image, "~> 0.67.0"},
+      {:image, "~> 0.68.0"},
       {:nimble_options, "~> 1.1"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.40.2", only: :dev, runtime: false}
